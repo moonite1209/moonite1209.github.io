@@ -135,7 +135,7 @@
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">1</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">2</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -188,6 +188,194 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://moonite1209.github.io/2025/05/30/lecture1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="author">
+      <meta itemprop="description" content="description">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="title">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2025/05/30/lecture1/" class="post-title-link" itemprop="url">lecture1</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-05-30 09:52:12 / 修改时间：09:53:51" itemprop="dateCreated datePublished" datetime="2025-05-30T09:52:12+08:00">2025-05-30</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="课前准备"><a href="#课前准备" class="headerlink" title="课前准备"></a>课前准备</h2><h3 id="阅读论文MapReduce"><a href="#阅读论文MapReduce" class="headerlink" title="阅读论文MapReduce"></a>阅读论文MapReduce</h3><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>MapReduce是一种新的抽象机制，使我们能够表达原本试图执行的简单计算，同时将并行化、容错、数据分布和负载均衡等复杂的细节隐藏在一个库中。我们的大多数计算任务都涉及对输入数据中的每个逻辑“记录”执行一次映射操作，以计算出一组中间的键值对，然后对具有相同键的所有值执行一次归约操作，以适当地合并生成的数据。我们采用一种函数模型，并由用户定义map和reduce操作，这样可以轻松地实现大规模计算的并行化，并使用重复执行作为容错的主要机制。</p>
+<h4 id="编程模型"><a href="#编程模型" class="headerlink" title="编程模型"></a>编程模型</h4><p><img src="/assets/Pasted%20image%2020250527001705.png"><br><img src="/assets/Pasted%20image%2020250527120202.png"><br>输入k1，v1属于一个与中间输出k2，v2不同的定义域，而中间输出k2，v2和最终输出属于同一定义域。<br>例如倒排索引：<br><img src="/assets/mapreduce.png"><br>source表示源页面，target表示由源页面引用的目标页面。map输出一系列(target, source)二元组表示target被source引用，然后reduce针对同一target将该target的source收集起来得到引用该target的所有source。</p>
+<h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><p>在不同环境有不同的最佳实现方法。这个实现是用于Google的数据中心的，有着一个分布式文件系统<a href="lecture3">GFS</a>的支持。<br><img src="/assets/Pasted%20image%2020250527211040.png"></p>
+<ol>
+<li>用户程序中的 MapReduce 库首先将输入文件分割成 M 份，每份通常为 16 兆字节（MB）到 64 兆字节之间（用户可以通过可选参数进行控制）。然后，它会在一个由多台机器组成的集群上启动多个该程序的副本。</li>
+<li>程序的一个副本是特殊的 —— 它是主控节点（master）。其余的是工作节点（worker），它们的工作由主控节点分配。总共有 M 个 map 任务和 R 个 reduce 任务需要分配。主控节点选择空闲的工作节点，并为其分配一个 map 任务或 reduce 任务。</li>
+<li>被分配了 map 任务的工作节点会读取相应输入分片的内容。它从输入数据中解析出键&#x2F;值对（key&#x2F;value pairs），并将每个键&#x2F;值对传递给用户定义的 Map 函数。Map 函数生成的中间键&#x2F;值对会被缓存在内存中。</li>
+<li>周期性地，这些缓存的键&#x2F;值对会被写入本地磁盘，并通过分区函数将其划分到 R 个区域中。这些缓存数据在本地磁盘上的位置信息会被传回给主控节点，主控节点负责将这些位置信息转发给 reduce 工作节点。</li>
+<li>当 reduce 工作节点被主控节点通知这些数据位置后，它会通过远程过程调用（RPC）从 map 工作节点的本地磁盘上读取缓存的数据。当一个 reduce 工作节点读取完所有中间数据后，它会对这些数据按照中间键进行排序，以便将相同键的所有出现集中在一起。由于通常有很多不同的键被映射到同一个 reduce 任务中，因此需要进行排序。如果中间数据量太大而无法全部放入内存，则使用外部排序（external sort）方法。</li>
+<li>reduce 工作节点遍历排序后的中间数据，对于每一个遇到的唯一中间键，它会将该键以及对应的中间值集合传递给用户的 Reduce 函数。Reduce 函数的输出结果会被追加写入该 reduce 分区的最终输出文件中。</li>
+<li>当所有的 map 任务和 reduce 任务都完成后，主控节点会唤醒用户程序。此时，用户程序中的 MapReduce 调用返回到用户代码。<br>一旦执行成功，MapReduce 的输出结果就会保存在 R 个输出文件中（每个 reduce 任务对应一个文件，文件名由用户指定）。通常，用户不需要手动将这些 R 个输出文件合并成一个文件 —— 他们往往会将这些文件作为另一个 MapReduce 调用的输入，或者由另一个能够处理多文件输入的分布式应用程序来使用。</li>
+</ol>
+<h5 id="master中的数据结构"><a href="#master中的数据结构" class="headerlink" title="master中的数据结构"></a>master中的数据结构</h5><ol>
+<li>master维护着多个数据结构。对于每一个 map 任务和 reduce 任务，它都会记录其状态（空闲、进行中或已完成），以及执行该任务的worker机器的身份标识（针对非空闲任务）。</li>
+<li>master是中间输出文件的位置信息从 map 任务传递到 reduce 任务的通道。因此，对于每一个已完成的 map 任务，master会存储由该 map 任务生成的 R 个中间输出文件的位置和大小信息。</li>
+<li>这些位置和大小信息会在 map 任务完成时被更新。master会将这些信息逐步推送给那些正在执行 reduce 任务的工作节点。</li>
+</ol>
+<h5 id="容错机制"><a href="#容错机制" class="headerlink" title="容错机制"></a>容错机制</h5><h6 id="worker故障处理"><a href="#worker故障处理" class="headerlink" title="worker故障处理"></a>worker故障处理</h6><ul>
+<li>master会定期向每个worker发送心跳信号。如果在一定时间内没有收到某个worker的响应，master就会将该工作节点标记为故障。<ul>
+<li>由该故障worker完成的任何 map 任务都会被重置回初始的空闲状态，因此可以重新调度到其他worker上执行。</li>
+<li>正在故障worker上执行的任何 map 和reduce 任务也会被重置为空闲状态，并变得可被重新调度。</li>
+<li>已完成的 map 任务需要重新执行，是因为中间输出文件存储在故障worker的本地磁盘上，无法被访问。而已完成的 reduce 任务则不需要重新执行，因为输出文件保存在一个全局分布式文件系统<a href="lecture3">GFS</a>中。<br>当一个 map 任务最初由worker A 执行，随后又由worker B 执行（因为 A 故障），所有正在执行 reduce 任务的worker都会收到关于这次重新执行的通知。任何尚未从 A 读取数据的 reduce 任务将会从 B 读取数据。<br>MapReduce 能够很好地应对大规模的工作节点故障。例如，在一次 MapReduce 操作过程中，集群进行网络维护导致每次有大约 80 台机器在几分钟内不可达。MapReduce 的master只是简单地重新执行了这些不可达机器上的工作，并继续推进整体进度，最终成功完成了整个 MapReduce 操作。</li>
+</ul>
+</li>
+</ul>
+<h6 id="mater故障处理"><a href="#mater故障处理" class="headerlink" title="mater故障处理"></a>mater故障处理</h6><p>master定期将必要的数据结构的checkpoint写入<a href="lecture3">GFS</a>。如果master故障，可以从最近的checkpoint恢复一个新的master副本。然而，考虑到只有一个master，其发生故障的概率较低；因此我们的当前实现中，一旦master故障，整个 MapReduce 计算就会终止。客户端可以检测这种情况，并根据需要选择重新尝试执行 MapReduce 操作。</p>
+<h6 id="故障下的程序语义"><a href="#故障下的程序语义" class="headerlink" title="故障下的程序语义"></a>故障下的程序语义</h6><p>当用户提供的 map 和 reduce 操作符是其输入值的<strong>纯函数</strong>时，我们的分布式实现产生的输出与在整个程序的不出错的顺序执行下所产生的输出相同。我们依靠对 map 和 reduce 任务输出的<strong>原子提交</strong>来实现这一特性。<br>每个正在进行的任务将其输出写入私有的临时文件中：</p>
+<ul>
+<li>一个 map 任务生成 R 个这样的临时文件，每个对应一个 reduce 任务。</li>
+<li>一个 reduce 任务生成一个这样的临时文件。<br>当一个 map 任务完成后，worker会向master发送一条消息，并包含这 R 个临时文件名。如果master收到了一个已经完成的 map 任务的完成消息，它会忽略这条消息；否则，它会将这 R 个文件的名称记录到master的数据结构中。<br>当一个 reduce 任务完成后，reduce worker会以将它的临时中间输出文件<strong>原子重命名</strong>为最终的输出文件。如果同一个 reduce 任务在多个机器上执行过，则会有多个重命名操作针对同一个最终输出文件。我们依赖底层文件系统提供的原子重命名操作，来保证最终的文件系统状态仅包含一次 reduce 任务的执行结果。<br>我们绝大多数的 map 和 reduce 函数都是纯函数。在这种情况下，我们的语义等价于顺序执行，这让程序员很容易理解和推理他们程序的行为。<br>当 map 和 reduce 函数是非纯函数时，我们会提供较弱但仍合理的语义。在这种情况下，某个特定 reduce 任务 R1 的输出等价于该非确定性程序的一次顺序执行中 R1 所产生的输出。然而，另一个 reduce 任务 R2 的输出可能对应于该非确定性程序的另一次顺序执行中 R2 的输出。<br>考虑一个 map 任务 M 和两个 reduce 任务 R1 和 R2。令 e(Ri) 表示最终提交的那个 Ri 的执行（每个任务恰好有一次这样的执行）。之所以语义变弱，是因为 e(R1) 可能读取的是某一次 M 的执行结果，而 e(R2) 可能读取的是另一次 M 的执行结果。</li>
+</ul>
+<h6 id="局部性"><a href="#局部性" class="headerlink" title="局部性"></a>局部性</h6><p>在网络带宽是我们计算环境中相对稀缺资源的情况下，我们通过利用这样一个事实来节省网络带宽：输入数据（由 GFS [8] 管理）存储在构成集群的机器的本地磁盘上。</p>
+<p>GFS 将每个文件划分为 64MB 的块，并为每个块存储多个副本（通常是 3 个副本），分别保存在不同的机器上。</p>
+<p>MapReduce 主控节点会考虑输入文件的位置信息，并尽量将 map 任务调度到包含相应输入数据副本的机器上执行。如果无法做到这一点，它会尝试将 map 任务调度到离该输入数据副本较近的位置（例如，在与数据所在机器处于同一网络交换机下的工作节点上）。</p>
+<p>当在一个集群中对大量工作节点运行大规模 MapReduce 操作时，大多数输入数据都是从本地读取的，因此不消耗任何网络带宽。</p>
+<h6 id="任务粒度"><a href="#任务粒度" class="headerlink" title="任务粒度"></a>任务粒度</h6><p>如前所述，我们将 map 阶段划分为 M 个部分，reduce 阶段划分为 R 个部分。</p>
+<p>理想情况下，M 和 R 应该远大于工作节点的数量。这样可以让每个工作节点执行许多不同的任务，从而提高动态负载均衡的效果，同时也加快了在某个工作节点失败时的恢复速度：该节点已完成的多个 map 任务可以分布到所有其他工作节点上重新执行。</p>
+<p>然而在我们的实现中，M 和 R 的大小也存在实际限制，因为主控节点必须做出 O(M + R) 次调度决策，并且如前所述，它需要在内存中维护 O(M × R) 大小的状态信息。（不过内存使用的常数因子是很小的：这部分 O(M × R) 的状态中，每个 map 任务&#x2F; reduce 任务组合大约只占一个字节的数据。）</p>
+<p>此外，R 的取值通常受到用户的限制，因为每个 reduce 任务的输出会写入一个独立的输出文件中。在实际应用中，我们通常选择 M 的大小，使得每个任务处理大约 16MB 到 64MB 的输入数据（这样可以使上述提到的数据本地性优化效果最佳）。而 R 的取值通常是预期使用的工作节点数量的一个较小倍数。</p>
+<p>我们经常在使用 2000 台工作机器 的情况下，执行 MapReduce 计算任务，其中设置 M &#x3D; 200,000 和 R &#x3D; 5,000。</p>
+<h6 id="备份任务"><a href="#备份任务" class="headerlink" title="备份任务"></a>备份任务</h6><p>导致一次 MapReduce 操作总耗时延长的一个常见原因是“<strong>慢任务</strong>”（straggler）：某个机器花费了异常长的时间来完成计算中最后几个 map 或 reduce 任务。</p>
+<p>出现 straggler 的原因有很多。例如：</p>
+<ul>
+<li>一台磁盘有问题的机器可能会频繁发生可纠正的读取错误，导致其读取速度从 30MB&#x2F;s 下降到 1MB&#x2F;s。</li>
+<li>集群调度系统可能在该机器上安排了其他任务，造成与 MapReduce 代码之间的 CPU、内存、本地磁盘或网络带宽竞争，从而减慢执行速度。</li>
+<li>我们最近遇到的一个问题是机器初始化代码中的一个 bug，导致处理器缓存被禁用，受影响的机器上的计算速度下降了超过 100 倍。</li>
+</ul>
+<p>为了解决 straggler 问题，我们设计了一种通用机制：</p>
+<blockquote>
+<p>当一次 MapReduce 操作接近完成时，主控节点会为仍在进行的任务启动<strong>备份执行</strong>（backup executions）。只要<strong>主任务或备份任务其中一个完成</strong>，就认为该任务已完成。</p>
+</blockquote>
+<p>我们对这一机制进行了调优，使其通常只会增加操作所使用的计算资源<strong>不到几个百分点</strong>。我们发现，这种机制显著减少了大规模 MapReduce 操作的完成时间。</p>
+<p>举个例子，在关闭备份任务机制的情况下，第 5.3 节中描述的排序程序的执行时间会<strong>增加 44%</strong>。</p>
+<h5 id="改进功能（Refinements）"><a href="#改进功能（Refinements）" class="headerlink" title="改进功能（Refinements）"></a>改进功能（Refinements）</h5><p>虽然仅通过编写 Map 和 Reduce 函数就能满足大多数需求的基本功能已经足够强大，但我们发现一些扩展功能也非常有用。本节将对这些功能进行介绍。</p>
+<h6 id="分区函数（Partitioning-Function）"><a href="#分区函数（Partitioning-Function）" class="headerlink" title="分区函数（Partitioning Function）"></a>分区函数（Partitioning Function）</h6><p>MapReduce 的用户可以指定他们希望生成的 reduce 任务&#x2F;输出文件的数量（R）。中间数据会根据**中间键（intermediate key）<strong>使用一个</strong>分区函数（partitioning function）**来分配到这些任务中。</p>
+<p>默认提供的分区函数是基于哈希的函数（例如：“hash(key) mod R”），这通常能够实现较为均衡的分区效果。</p>
+<p>但在某些情况下，我们可能希望根据键的其他属性来进行分区。例如，有时输出的键是 URL，而我们希望同一个主机的所有条目最终都落在同一个输出文件中。</p>
+<p>为了支持这类场景，MapReduce 库的用户可以提供一个自定义的分区函数。例如，使用 “hash(Hostname(urlkey)) mod R” 作为分区函数，就可以确保来自同一主机的所有 URL 都会被分配到同一个输出文件中。</p>
+<hr>
+<h6 id="排序保证（Ordering-Guarantees）"><a href="#排序保证（Ordering-Guarantees）" class="headerlink" title="排序保证（Ordering Guarantees）"></a>排序保证（Ordering Guarantees）</h6><p>我们保证：在给定的某个分区中，中间键值对（key&#x2F;value pairs）会按照键的升序顺序进行处理。</p>
+<p>这一排序保证使得每个分区很容易生成有序的输出文件，这对于以下两种情况特别有用：</p>
+<ul>
+<li>输出文件格式需要支持按键进行高效的随机访问查询；</li>
+<li>用户在使用输出时更倾向于看到排序后的数据。</li>
+</ul>
+<hr>
+<h6 id="合并函数（Combiner-Function）"><a href="#合并函数（Combiner-Function）" class="headerlink" title="合并函数（Combiner Function）"></a>合并函数（Combiner Function）</h6><p>在某些情况下，每个 map 任务产生的中间键会有大量重复，并且用户的 Reduce 函数是<strong>可交换、可结合</strong>的。一个典型的例子就是第 2.1 节中的单词计数程序。</p>
+<p>由于词频往往遵循 Zipf 分布，每个 map 任务会产生数百甚至数千个类似 <code>&lt;the, 1&gt;</code> 这样的记录。所有这些计数值都会通过网络发送到一个 reduce 任务中，然后由 Reduce 函数合并为一个总和。</p>
+<p>我们允许用户指定一个<strong>可选的 Combiner 函数</strong>，在数据传输前就对其进行部分合并操作。</p>
+<p>Combiner 函数会在执行 map 任务的机器上运行。通常，Combiner 函数与 Reduce 函数使用相同的代码实现。</p>
+<p>它们之间的唯一区别在于 MapReduce 库如何处理它们的输出：</p>
+<ul>
+<li>Reduce 函数的输出写入最终输出文件；</li>
+<li>Combiner 函数的输出写入中间文件，并被发送给 reduce 任务进一步处理。</li>
+</ul>
+<p>部分合并（partial combining）显著加快了某些类型的 MapReduce 操作的速度。附录 A 包含了一个使用 Combiner 函数的例子。</p>
+<h6 id="输入与输出类型（Input-and-Output-Types）"><a href="#输入与输出类型（Input-and-Output-Types）" class="headerlink" title="输入与输出类型（Input and Output Types）"></a>输入与输出类型（Input and Output Types）</h6><p>MapReduce 库支持多种不同的输入数据格式。例如：</p>
+<p>“文本”模式：将文件中的每一行视为一个键值对，其中键是该行在文件中的偏移量，值是该行的内容。<br>另一种常见的格式是按键排序存储的键值对序列。<br>每种输入类型的实现都清楚如何将自身划分为有意义的范围，以便作为不同的 map 任务进行处理（例如，在文本模式中，范围划分会确保只在行边界处分割）。</p>
+<p>用户可以通过实现一个简单的读取器接口来添加对新输入类型的支持，尽管大多数用户只需使用少量预定义的输入类型之一。</p>
+<p>一个读取器（reader）并不一定非得从文件中读取数据。例如，很容易定义一个从数据库或内存映射的数据结构中读取记录的 reader。</p>
+<p>类似地，我们也支持一组输出类型，用于生成不同格式的数据，并且用户代码可以轻松扩展以支持新的输出类型。</p>
+<h6 id="副作用（Side-effects）"><a href="#副作用（Side-effects）" class="headerlink" title="副作用（Side-effects）"></a>副作用（Side-effects）</h6><p>在某些情况下，MapReduce 的用户发现通过其 map 和&#x2F;或 reduce 函数生成辅助文件作为额外输出是非常方便的。我们依赖应用程序开发者确保这些副作用的操作是原子性和幂等性的。</p>
+<p>通常的做法是：应用程序先写入一个临时文件，待文件完全生成后再以原子方式重命名该文件。</p>
+<p>我们不提供对单个任务生成多个输出文件时的跨文件一致性提交（如两阶段提交）的支持。因此，如果某个任务需要生成多个具有跨文件一致性的输出文件，它应该是确定性的。这一限制在实际应用中从未造成过问题。</p>
+<h6 id="跳过错误记录（Skipping-Bad-Records）"><a href="#跳过错误记录（Skipping-Bad-Records）" class="headerlink" title="跳过错误记录（Skipping Bad Records）"></a>跳过错误记录（Skipping Bad Records）</h6><p>有时用户的代码中存在 bug，会导致 map 或 reduce 函数在处理某些记录时确定性崩溃。这种错误会阻止整个 MapReduce 操作完成。</p>
+<p>通常的解决方法是修复 bug，但有时这并不可行；例如，bug 可能存在于没有源码的第三方库中。此外，在对大数据集进行统计分析时，有时忽略少数几条记录是可以接受的。</p>
+<p>为此，我们提供了一种可选的执行模式：MapReduce 库可以检测出导致确定性崩溃的记录，并跳过这些记录以继续推进计算。</p>
+<p>每个工作进程都会安装一个信号处理器，用于捕获段错误（segmentation violation）和总线错误（bus error）等异常。在调用用户的 map 或 reduce 函数之前，MapReduce 库会将当前参数的序列号保存在一个全局变量中。</p>
+<p>如果用户代码产生了信号（如崩溃），信号处理程序会发送一个包含该序列号的“最后挣扎”UDP包给主控节点（MapReduce master）。当主控节点发现某条记录已经失败超过一次时，它会在下次重新执行相应的 map 或 reduce 任务时指示跳过这条记录。</p>
+<h6 id="本地执行（Local-Execution）"><a href="#本地执行（Local-Execution）" class="headerlink" title="本地执行（Local Execution）"></a>本地执行（Local Execution）</h6><p>调试 Map 或 Reduce 函数中的问题是比较困难的，因为实际的计算发生在分布式系统中，常常运行在几千台机器上，任务分配由主控节点动态决定。</p>
+<p>为了便于调试、性能分析和小规模测试，我们开发了 MapReduce 库的一个替代实现：它可以在本地机器上顺序执行整个 MapReduce 操作的所有工作。</p>
+<p>该实现为用户提供了控制选项，使得计算可以限制在特定的 map 任务上执行。用户可以通过设置一个特殊标志来启动程序，并使用任何他们认为有用的调试或测试工具（例如 gdb）进行调试。</p>
+<h6 id="状态信息（Status-Information）"><a href="#状态信息（Status-Information）" class="headerlink" title="状态信息（Status Information）"></a>状态信息（Status Information）</h6><p>主控节点运行一个内部 HTTP 服务器，并导出一组供人类查看的状态页面。</p>
+<p>状态页面显示了计算的进度信息，包括：</p>
+<p>已完成的任务数量<br>正在进行的任务数量<br>输入字节数、中间数据字节数、输出字节数<br>处理速率等<br>这些页面还包含指向每个任务生成的标准错误（stderr）和标准输出（stdout）文件的链接。</p>
+<p>用户可以利用这些信息预测计算所需时间，判断是否需要增加更多资源。这些信息还可以帮助识别计算是否比预期慢得多。</p>
+<p>此外，顶层状态页面还显示了哪些工作节点已失败，以及它们在失败时正在处理哪些 map 和 reduce 任务。这些信息对于诊断用户代码中的 bug 非常有用。</p>
+<h6 id="计数器（Counters）"><a href="#计数器（Counters）" class="headerlink" title="计数器（Counters）"></a>计数器（Counters）</h6><p>MapReduce 库提供了一个计数器功能，用于统计各种事件的发生次数。例如，用户代码可能希望统计处理的单词总数、索引的德语文档数量等。</p>
+<p>要使用这一功能，用户代码需要创建一个命名的计数器对象，并在 map 和&#x2F;或 reduce 函数中适当地对其进行递增操作。例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase = GetCounter(<span class="string">&quot;uppercase&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>(String name, String contents):</span><br><span class="line">    <span class="keyword">for</span> each word w <span class="keyword">in</span> contents:</span><br><span class="line">        <span class="keyword">if</span> (IsCapitalized(w)):</span><br><span class="line">            uppercase-&gt;Increment();</span><br><span class="line">        EmitIntermediate(w, <span class="string">&quot;1&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>来自各个工作节点的计数器值会定期传播到主控节点（通过心跳响应捎带上传）。主控节点会对所有成功完成的 map 和 reduce 任务的计数器值进行汇总，并在 MapReduce 操作完成后将结果返回给用户代码。</p>
+<p>当前的计数器值也会显示在主控节点的状态页面上，以便人类观察计算的进度。</p>
+<p>在汇总计数器值时，主控节点会排除相同 map 或 reduce 任务的重复执行，以避免重复计数。（重复执行可能来自于我们使用的备份任务机制，或者由于任务失败而重新执行。）</p>
+<p>此外，MapReduce 库还会自动维护一些内置计数器，例如：</p>
+<p>处理的输入键值对数量；<br>生成的输出键值对数量等。<br>用户发现计数器功能对于检查 MapReduce 操作的行为是否正常非常有用。例如，在某些 MapReduce 操作中，用户代码可能希望确保生成的输出键值对数量正好等于处理的输入键值对数量，或者希望处理的德语文档所占比例在总文档数量的某个可接受范围内。</p>
+<h2 id="课程内容"><a href="#课程内容" class="headerlink" title="课程内容"></a>课程内容</h2><h3 id="容错："><a href="#容错：" class="headerlink" title="容错："></a>容错：</h3><ol>
+<li>可用性<br>系统在遭遇某些特定类型的错误时仍能工作，比如对于有两个备份的系统，可以在有一个备份错误时保持工作，但在两个备份错误时不能保证。</li>
+<li>可恢复性<br>出现错误时系统可能停止工作，但是在被修复后系统可以恢复正常运行。常见做法是在系统崩溃前做一些事，比如存盘。</li>
+</ol>
+<h4 id="常见的解决方法："><a href="#常见的解决方法：" class="headerlink" title="常见的解决方法："></a>常见的解决方法：</h4><ol>
+<li>使用副本，主要挑战是副本之间的同步和一致性问题</li>
+<li>使用非易失性存储保存一些检查点或日志，主要挑战是非易失性存储速度慢，要尽量减少对非易失性存储的读写</li>
+</ol>
+<h3 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h3><p>例如一个多副本的分布式KV系统，支持Put(k,v)和Get(k)。</p>
+<h4 id="强一致性"><a href="#强一致性" class="headerlink" title="强一致性"></a>强一致性</h4><p>保证Get得到的一定是最新的值，但是强一致性有很大的代价，需要很多的通信去保证强一致性。例如Put和Get可能都需要访问所有的副本。</p>
+<h4 id="弱一致性"><a href="#弱一致性" class="headerlink" title="弱一致性"></a>弱一致性</h4><h2 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h2><p>一个框架让非分布式专家也能编写和运行巨型的分布式计算程序。<br>假设有一些输入，输入以某种方式被分成一堆不同的文件或块，在每个文件或块上运行Map函数（这里可以并行）得到一个key value形式的中间输出</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -338,7 +526,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">1</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -375,12 +563,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">0k</span>
+    <span title="站点总字数">9k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1 分钟</span>
+    <span title="站点阅读时长">8 分钟</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>

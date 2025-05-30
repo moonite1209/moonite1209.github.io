@@ -1,9 +1,265 @@
-<?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title>lecture1</title>
-    <url>/2025/05/30/lecture1/</url>
-    <content><![CDATA[<h2 id="课前准备"><a href="#课前准备" class="headerlink" title="课前准备"></a>课前准备</h2><h3 id="阅读论文MapReduce"><a href="#阅读论文MapReduce" class="headerlink" title="阅读论文MapReduce"></a>阅读论文MapReduce</h3><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>MapReduce是一种新的抽象机制，使我们能够表达原本试图执行的简单计算，同时将并行化、容错、数据分布和负载均衡等复杂的细节隐藏在一个库中。我们的大多数计算任务都涉及对输入数据中的每个逻辑“记录”执行一次映射操作，以计算出一组中间的键值对，然后对具有相同键的所有值执行一次归约操作，以适当地合并生成的数据。我们采用一种函数模型，并由用户定义map和reduce操作，这样可以轻松地实现大规模计算的并行化，并使用重复执行作为容错的主要机制。</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"moonite1209.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="课前准备阅读论文MapReduce介绍MapReduce是一种新的抽象机制，使我们能够表达原本试图执行的简单计算，同时将并行化、容错、数据分布和负载均衡等复杂的细节隐藏在一个库中。我们的大多数计算任务都涉及对输入数据中的每个逻辑“记录”执行一次映射操作，以计算出一组中间的键值对，然后对具有相同键的所有值执行一次归约操作，以适当地合并生成的数据。我们采用一种函数模型，并由用户定义map和reduce">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lecture1">
+<meta property="og:url" content="https://moonite1209.github.io/2025/05/30/lecture1/index.html">
+<meta property="og:site_name" content="title">
+<meta property="og:description" content="课前准备阅读论文MapReduce介绍MapReduce是一种新的抽象机制，使我们能够表达原本试图执行的简单计算，同时将并行化、容错、数据分布和负载均衡等复杂的细节隐藏在一个库中。我们的大多数计算任务都涉及对输入数据中的每个逻辑“记录”执行一次映射操作，以计算出一组中间的键值对，然后对具有相同键的所有值执行一次归约操作，以适当地合并生成的数据。我们采用一种函数模型，并由用户定义map和reduce">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://moonite1209.github.io/assets/Pasted%20image%2020250527001705.png">
+<meta property="og:image" content="https://moonite1209.github.io/assets/Pasted%20image%2020250527120202.png">
+<meta property="og:image" content="https://moonite1209.github.io/assets/mapreduce.png">
+<meta property="og:image" content="https://moonite1209.github.io/assets/Pasted%20image%2020250527211040.png">
+<meta property="article:published_time" content="2025-05-30T01:52:12.742Z">
+<meta property="article:modified_time" content="2025-05-30T01:53:51.767Z">
+<meta property="article:author" content="author">
+<meta property="article:tag" content="keywords,keywords,keywords">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://moonite1209.github.io/assets/Pasted%20image%2020250527001705.png">
+
+<link rel="canonical" href="https://moonite1209.github.io/2025/05/30/lecture1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>lecture1 | title</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">title</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">subtitle</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">0</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">2</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://moonite1209.github.io/2025/05/30/lecture1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="author">
+      <meta itemprop="description" content="description">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="title">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          lecture1
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2025-05-30 09:52:12 / 修改时间：09:53:51" itemprop="dateCreated datePublished" datetime="2025-05-30T09:52:12+08:00">2025-05-30</time>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>8 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="课前准备"><a href="#课前准备" class="headerlink" title="课前准备"></a>课前准备</h2><h3 id="阅读论文MapReduce"><a href="#阅读论文MapReduce" class="headerlink" title="阅读论文MapReduce"></a>阅读论文MapReduce</h3><h4 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h4><p>MapReduce是一种新的抽象机制，使我们能够表达原本试图执行的简单计算，同时将并行化、容错、数据分布和负载均衡等复杂的细节隐藏在一个库中。我们的大多数计算任务都涉及对输入数据中的每个逻辑“记录”执行一次映射操作，以计算出一组中间的键值对，然后对具有相同键的所有值执行一次归约操作，以适当地合并生成的数据。我们采用一种函数模型，并由用户定义map和reduce操作，这样可以轻松地实现大规模计算的并行化，并使用重复执行作为容错的主要机制。</p>
 <h4 id="编程模型"><a href="#编程模型" class="headerlink" title="编程模型"></a>编程模型</h4><p><img src="/assets/Pasted%20image%2020250527001705.png"><br><img src="/assets/Pasted%20image%2020250527120202.png"><br>输入k1，v1属于一个与中间输出k2，v2不同的定义域，而中间输出k2，v2和最终输出属于同一定义域。<br>例如倒排索引：<br><img src="/assets/mapreduce.png"><br>source表示源页面，target表示由源页面引用的目标页面。map输出一系列(target, source)二元组表示target被source引用，然后reduce针对同一target将该target的source收集起来得到引用该target的所有source。</p>
 <h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4><p>在不同环境有不同的最佳实现方法。这个实现是用于Google的数据中心的，有着一个分布式文件系统<a href="lecture3">GFS</a>的支持。<br><img src="/assets/Pasted%20image%2020250527211040.png"></p>
 <ol>
@@ -102,7 +358,7 @@
 <p>此外，顶层状态页面还显示了哪些工作节点已失败，以及它们在失败时正在处理哪些 map 和 reduce 任务。这些信息对于诊断用户代码中的 bug 非常有用。</p>
 <h6 id="计数器（Counters）"><a href="#计数器（Counters）" class="headerlink" title="计数器（Counters）"></a>计数器（Counters）</h6><p>MapReduce 库提供了一个计数器功能，用于统计各种事件的发生次数。例如，用户代码可能希望统计处理的单词总数、索引的德语文档数量等。</p>
 <p>要使用这一功能，用户代码需要创建一个命名的计数器对象，并在 map 和&#x2F;或 reduce 函数中适当地对其进行递增操作。例如：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase = GetCounter(<span class="string">&quot;uppercase&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>(String name, String contents):</span><br><span class="line">    <span class="keyword">for</span> each word w <span class="keyword">in</span> contents:</span><br><span class="line">        <span class="keyword">if</span> (IsCapitalized(w)):</span><br><span class="line">            uppercase-&gt;Increment();</span><br><span class="line">        EmitIntermediate(w, <span class="string">&quot;1&quot;</span>);</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Counter* uppercase;</span><br><span class="line">uppercase = GetCounter(<span class="string">&quot;uppercase&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>(String name, String contents):</span><br><span class="line">    <span class="keyword">for</span> each word w <span class="keyword">in</span> contents:</span><br><span class="line">        <span class="keyword">if</span> (IsCapitalized(w)):</span><br><span class="line">            uppercase-&gt;Increment();</span><br><span class="line">        EmitIntermediate(w, <span class="string">&quot;1&quot;</span>);</span><br></pre></td></tr></table></figure>
 <p>来自各个工作节点的计数器值会定期传播到主控节点（通过心跳响应捎带上传）。主控节点会对所有成功完成的 map 和 reduce 任务的计数器值进行汇总，并在 MapReduce 操作完成后将结果返回给用户代码。</p>
 <p>当前的计数器值也会显示在主控节点的状态页面上，以便人类观察计算的进度。</p>
 <p>在汇总计数器值时，主控节点会排除相同 map 或 reduce 任务的重复执行，以避免重复计数。（重复执行可能来自于我们使用的备份任务机制，或者由于任务失败而重新执行。）</p>
@@ -119,24 +375,218 @@
 <h3 id="一致性"><a href="#一致性" class="headerlink" title="一致性"></a>一致性</h3><p>例如一个多副本的分布式KV系统，支持Put(k,v)和Get(k)。</p>
 <h4 id="强一致性"><a href="#强一致性" class="headerlink" title="强一致性"></a>强一致性</h4><p>保证Get得到的一定是最新的值，但是强一致性有很大的代价，需要很多的通信去保证强一致性。例如Put和Get可能都需要访问所有的副本。</p>
 <h4 id="弱一致性"><a href="#弱一致性" class="headerlink" title="弱一致性"></a>弱一致性</h4><h2 id="MapReduce"><a href="#MapReduce" class="headerlink" title="MapReduce"></a>MapReduce</h2><p>一个框架让非分布式专家也能编写和运行巨型的分布式计算程序。<br>假设有一些输入，输入以某种方式被分成一堆不同的文件或块，在每个文件或块上运行Map函数（这里可以并行）得到一个key value形式的中间输出</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2025/05/28/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+    </div>
 
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+    
+    
+    
 
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+      <footer class="post-footer">
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-]]></content>
-  </entry>
-</search>
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2025/05/28/hello-world/" rel="prev" title="Hello World">
+      <i class="fa fa-chevron-left"></i> Hello World
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E5%89%8D%E5%87%86%E5%A4%87"><span class="nav-number">1.</span> <span class="nav-text">课前准备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%85%E8%AF%BB%E8%AE%BA%E6%96%87MapReduce"><span class="nav-number">1.1.</span> <span class="nav-text">阅读论文MapReduce</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.1.2.</span> <span class="nav-text">编程模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.1.3.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#master%E4%B8%AD%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">master中的数据结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%B9%E9%94%99%E6%9C%BA%E5%88%B6"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">容错机制</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#worker%E6%95%85%E9%9A%9C%E5%A4%84%E7%90%86"><span class="nav-number">1.1.3.2.1.</span> <span class="nav-text">worker故障处理</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#mater%E6%95%85%E9%9A%9C%E5%A4%84%E7%90%86"><span class="nav-number">1.1.3.2.2.</span> <span class="nav-text">mater故障处理</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%95%85%E9%9A%9C%E4%B8%8B%E7%9A%84%E7%A8%8B%E5%BA%8F%E8%AF%AD%E4%B9%89"><span class="nav-number">1.1.3.2.3.</span> <span class="nav-text">故障下的程序语义</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%B1%80%E9%83%A8%E6%80%A7"><span class="nav-number">1.1.3.2.4.</span> <span class="nav-text">局部性</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E7%B2%92%E5%BA%A6"><span class="nav-number">1.1.3.2.5.</span> <span class="nav-text">任务粒度</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%A4%87%E4%BB%BD%E4%BB%BB%E5%8A%A1"><span class="nav-number">1.1.3.2.6.</span> <span class="nav-text">备份任务</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%E5%8A%9F%E8%83%BD%EF%BC%88Refinements%EF%BC%89"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">改进功能（Refinements）</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%88%86%E5%8C%BA%E5%87%BD%E6%95%B0%EF%BC%88Partitioning-Function%EF%BC%89"><span class="nav-number">1.1.3.3.1.</span> <span class="nav-text">分区函数（Partitioning Function）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E4%BF%9D%E8%AF%81%EF%BC%88Ordering-Guarantees%EF%BC%89"><span class="nav-number">1.1.3.3.2.</span> <span class="nav-text">排序保证（Ordering Guarantees）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%90%88%E5%B9%B6%E5%87%BD%E6%95%B0%EF%BC%88Combiner-Function%EF%BC%89"><span class="nav-number">1.1.3.3.3.</span> <span class="nav-text">合并函数（Combiner Function）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%E4%B8%8E%E8%BE%93%E5%87%BA%E7%B1%BB%E5%9E%8B%EF%BC%88Input-and-Output-Types%EF%BC%89"><span class="nav-number">1.1.3.3.4.</span> <span class="nav-text">输入与输出类型（Input and Output Types）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%89%AF%E4%BD%9C%E7%94%A8%EF%BC%88Side-effects%EF%BC%89"><span class="nav-number">1.1.3.3.5.</span> <span class="nav-text">副作用（Side-effects）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E8%B7%B3%E8%BF%87%E9%94%99%E8%AF%AF%E8%AE%B0%E5%BD%95%EF%BC%88Skipping-Bad-Records%EF%BC%89"><span class="nav-number">1.1.3.3.6.</span> <span class="nav-text">跳过错误记录（Skipping Bad Records）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E6%89%A7%E8%A1%8C%EF%BC%88Local-Execution%EF%BC%89"><span class="nav-number">1.1.3.3.7.</span> <span class="nav-text">本地执行（Local Execution）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E7%8A%B6%E6%80%81%E4%BF%A1%E6%81%AF%EF%BC%88Status-Information%EF%BC%89"><span class="nav-number">1.1.3.3.8.</span> <span class="nav-text">状态信息（Status Information）</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E8%AE%A1%E6%95%B0%E5%99%A8%EF%BC%88Counters%EF%BC%89"><span class="nav-number">1.1.3.3.9.</span> <span class="nav-text">计数器（Counters）</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%BE%E7%A8%8B%E5%86%85%E5%AE%B9"><span class="nav-number">2.</span> <span class="nav-text">课程内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%B9%E9%94%99%EF%BC%9A"><span class="nav-number">2.1.</span> <span class="nav-text">容错：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95%EF%BC%9A"><span class="nav-number">2.1.1.</span> <span class="nav-text">常见的解决方法：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">一致性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%BA%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.2.1.</span> <span class="nav-text">强一致性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%B1%E4%B8%80%E8%87%B4%E6%80%A7"><span class="nav-number">2.2.2.</span> <span class="nav-text">弱一致性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MapReduce"><span class="nav-number">3.</span> <span class="nav-text">MapReduce</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">author</p>
+  <div class="site-description" itemprop="description">description</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">author</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">9k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">8 分钟</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
